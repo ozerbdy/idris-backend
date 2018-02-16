@@ -23,3 +23,25 @@ module.exports.get = function(token){
     return mongo.client.collection(CollectionName)
         .findOne(query);
 };
+
+module.exports.updateInfo = function (userId, latitude, longitude, weightCapacity, piecesCapacity) {
+    const query = {
+        _id: is.string(userId) ? ObjectId(userId) : userId
+    };
+
+    const update = {
+        $set: {
+            coordinates : {
+                latitude: latitude,
+                longitude: longitude
+            },
+            capacity: {
+                weight: weightCapacity,
+                pieces: piecesCapacity
+            }
+        }
+    };
+
+    return mongo.client.collection(CollectionName)
+        .updateOne(query, update);
+};

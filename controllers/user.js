@@ -12,7 +12,26 @@ module.exports.login = async (req, res) => {
     return res.send({
         status: ResponseHelpers.getBasicResponseObject(Constants.SuccessInfo),
         user:{
+            username: username,
             token: userId
         }
     });
+};
+
+module.exports.check = async (req, res) => {
+    const user = req.user;
+    const userId = user._id.toString();
+    const coordinates = req.body.coordinates;
+    const latitude = coordinates.latitude;
+    const longitude = coordinates.longitude;
+    const capacity = req.body.capacity;
+    const weightCapacity = capacity.weight;
+    const piecesCapacity = capacity.pieces;
+
+    await UserRepository.updateInfo(userId, latitude, longitude, weightCapacity, piecesCapacity);
+
+    return res.send({
+        status: ResponseHelpers.getBasicResponseObject(Constants.SuccessInfo)
+    });
+
 };
