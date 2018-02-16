@@ -1,6 +1,7 @@
 const express = require('express'),
     app = express(),
     bodyParser = require('body-parser'),
+    mongo = require('./db/mongo');
 
 const port = process.env.PORT || 3000;
 const mongoURL = process.env.MONGO_URL;
@@ -13,5 +14,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
-
-app.listen(port, () => console.log(`App listening on port ${port}!`));
+mongo.init(mongoURL, mongoDbName, (err) => {
+    if(err) throw err;
+    console.log('Mongo connection established successfully!');
+    app.listen(port, () => console.log(`App listening on port ${port}!`));
+});
