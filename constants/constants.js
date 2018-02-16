@@ -19,3 +19,6 @@ module.exports.CollectionNames = {
     packages: 'packages',
     transportations: 'transportations'
 };
+
+
+module.exports.TOKEN_REQUEST_HEADER_NAME = 'token';
