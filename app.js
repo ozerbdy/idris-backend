@@ -1,7 +1,9 @@
 const express = require('express'),
     app = express(),
     bodyParser = require('body-parser'),
-    mongo = require('./db/mongo');
+    mongo = require('./db/mongo'),
+    routes = require('./routes');
+
 
 const port = process.env.PORT || 3000;
 const mongoURL = process.env.MONGO_URL;
@@ -13,6 +15,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // parse application/json
 app.use(bodyParser.json());
+
+app.use(routes);
 
 mongo.init(mongoURL, mongoDbName, (err) => {
     if(err) throw err;
