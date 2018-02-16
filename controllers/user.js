@@ -1,4 +1,6 @@
-const UserRepository = require('../db/UserRepository');
+const UserRepository = require('../db/UserRepository'),
+    ResponseHelpers = require('../helpers/responseHelpers'),
+    Constants = require('../constants/constants');
 
 module.exports.login = async (req, res) => {
     const username = req.body.username;
@@ -8,11 +10,7 @@ module.exports.login = async (req, res) => {
     const userId = user._id.toString();
 
     return res.send({
-        status: {
-            code: 0,
-            success: true,
-            message: 'success'
-        },
+        status: ResponseHelpers.getBasicResponseObject(Constants.SuccessInfo),
         user:{
             token: userId
         }
