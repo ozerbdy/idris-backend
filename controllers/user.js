@@ -6,7 +6,7 @@ module.exports.login = async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
 
-    const user = await UserRepository.get(username, password);
+    const user = await UserRepository.getToken(username, password);
     const userId = user._id.toString();
 
     return res.send({

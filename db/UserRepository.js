@@ -3,7 +3,7 @@ const mongo = require('./mongo'),
 
 const CollectionName = Constants.CollectionNames.users;
 
-module.exports.get = function(username, password){
+module.exports.getToken = function(username, password){
     const query = {
         username: username,
         password: password
