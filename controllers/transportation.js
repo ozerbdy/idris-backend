@@ -26,7 +26,7 @@ module.exports.get = async (req, res) => {
                 gatheringPoint: Constants.GATHERING_POINT_COORDINATES
             });
         }
-        return ResponseHelpers.sendBasicResponse(res, Constants.ErrorInfo.MongoError);
+        return ResponseHelpers.sendBasicResponse(res, Constants.ErrorInfo.Transportation.NotFound);
     }catch(err){
         return ResponseHelpers.sendBasicResponse(res, Constants.ErrorInfo.MongoError, err);
     }
