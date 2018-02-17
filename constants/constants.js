@@ -6,6 +6,20 @@ module.exports.ErrorInfo = {
     MongoError: {
         message: 'Mongo operation failed',
         code: 2
+    },
+    AuthenticationFailed:{
+        message: 'Authentication failed',
+        code: 3
+    },
+    Transportation: {
+        NotFound : {
+            message: 'Transportation not found',
+            code: 40
+        },
+        WrongPickUpOrder:{
+            message: 'Wrong transportation pick up order',
+            code: 41
+        }
     }
 };
 
