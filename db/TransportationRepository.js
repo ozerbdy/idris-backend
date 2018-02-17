@@ -16,3 +16,29 @@ module.exports.add = function(userId, packageObjects){
     return mongo.client.collection(CollectionName)
         .insertOne(query);
 };
+
+module.exports.getAssigned = (userId) => {
+    const query = {
+        userId: userId,
+        state: Constants.TransportationState.assigned
+    };
+
+    return mongo.client.collection(CollectionName)
+        .findOne(query);
+};
+
+module.exports.updatePackageStatuses = (userId, newPackageStatuses) => {
+    const query = {
+        userId: userId,
+        state: Constants.TransportationState.assigned
+    };
+
+    const update = {
+        $set: {
+            packages: newPackageStatuses
+        }
+    };
+
+    return mongo.client.collection(CollectionName)
+        .updateOne(query, update);
+};
