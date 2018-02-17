@@ -1,7 +1,8 @@
-const mongo = require('./mongo'),
-    ObjectId = require('mongodb').ObjectId,
-    is = require('is_js'),
-    Constants = require('../constants/constants');
+const mongo = require('./mongo');
+const ObjectId = require('mongodb').ObjectId;
+const is = require('is_js');
+const TypeHelpers = require('../helpers/typeHelpers');
+const Constants = require('../constants/constants');
 
 const CollectionName = Constants.CollectionName.users;
 
@@ -22,6 +23,28 @@ module.exports.get = function(token){
 
     return mongo.client.collection(CollectionName)
         .findOne(query);
+};
+
+module.exports.updateCoordinates = function(userId, latitude, longitude){
+    const query = {
+        _id: is.string(userId) ? ObjectId(userId) : userId
+    };
+
+    const update = {
+        $set: {
+            coordinates : {
+                latitude: latitude,
+                longitude: longitude
+            },
+            capacity: {
+                weight: weightCapacity,
+                pieces: piecesCapacity
+            }
+        }
+    };
+
+    return mongo.client.collection(CollectionName)
+        .updateOne(query, update);
 };
 
 module.exports.updateInfo = function (userId, latitude, longitude, weightCapacity, piecesCapacity) {

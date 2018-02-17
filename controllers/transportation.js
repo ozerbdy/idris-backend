@@ -1,6 +1,7 @@
 const Promise = require('bluebird');
 const _ = require('lodash');
 const TypeHelpers = require('../helpers/typeHelpers');
+const UserRepository = require('../db/UserRepository');
 const PackageRepository = require('../db/PackageRepository');
 const TransportationRepository = require('../db/TransportationRepository');
 const GoogleMapsClient = require('../helpers/googleMapsHelpers').client;
@@ -33,11 +34,10 @@ module.exports.get = async (req, res) => {
 module.exports.apply = async (req, res) => {
     const user = res.locals.user;
     const userId = user._id;
-    const userCoordinates = user.coordinates;
+    const userCoordinates = req.body.coordinates;
     const userCapacity = user.capacity;
     try{
         const packages = await PackageRepository.getPortablesByUnits(userCapacity.weight, userCapacity.pieces);
-
         const distanceResults = await Promise.map(packages, (eachPackage) => {
             const distanceQuery = {
                 origins: userCoordinates,
@@ -72,6 +72,7 @@ module.exports.apply = async (req, res) => {
         });
 
         await Promise.all([
+            UserRepository.updateCoordinates(userId, userCoordinates.latitude, userCoordinates.longitude),
             PackageRepository.updateStates(packageObjectIds, Constants.PackageState.claimed),
             TransportationRepository.add(userId, packageTransportationObjects)
         ]);
