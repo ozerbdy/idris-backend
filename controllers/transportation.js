@@ -78,6 +78,10 @@ module.exports.apply = async (req, res) => {
             return packageToCarry._id;
         });
 
+        await Promise.map(packagesToCarry, (packageToCarry) => {
+            return PackageRepository.updateAddress(packageToCarry._id, packageToCarry.address);
+        });
+
         const packageTransportationObjects = _.map(packageObjectIds, (packageObjectId) => {
             return {
                 _id: packageObjectId,
