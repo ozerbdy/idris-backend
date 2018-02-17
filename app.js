@@ -2,6 +2,8 @@ const express = require('express'),
     app = express(),
     bodyParser = require('body-parser'),
     mongo = require('./db/mongo'),
+    socketIO = require('socket.io'),
+    socketIOManager = require('./socket/socketIOManager'),
     routes = require('./routes');
 
 
@@ -18,8 +20,12 @@ app.use(bodyParser.json());
 
 app.use(routes);
 
-mongo.init(mongoURL, mongoDbName, (err) => {
+mongo.init(mongoURL, mongoDbName, async (err) => {
     if(err) throw err;
     console.log('Mongo connection established successfully!');
-    app.listen(port, () => console.log(`App listening on port ${port}!`));
+    const http = require('http');
+    const server = http.createServer(app);
+    const io = socketIO(server);
+    server.listen(port ,() => console.log(`App listening on port ${port}!`))
+    socketIOManager.initalizeEventListeners(io);
 });
