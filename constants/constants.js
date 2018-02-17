@@ -19,6 +19,10 @@ module.exports.ErrorInfo = {
         WrongPickUpOrder:{
             message: 'Wrong transportation pick up order',
             code: 41
+        },
+        CannotFinishYet:{
+            message: 'Remaining packages to pick up, transportation cannot finish',
+            code: 42
         }
     }
 };
