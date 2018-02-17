@@ -9,6 +9,7 @@ module.exports.apply = async (req, res) => {
 
     const user = req.user;
     const userCoordinates = user.coordinates;
+    const userCapacity = user.capacity;
     try{
         //TODO Get only relevant packages according to weight and space capacity of user from db
         //TODO Then sort the relevant packages by distances
@@ -16,11 +17,11 @@ module.exports.apply = async (req, res) => {
         //TODO Mark packages as claimed for not them to be picked by another user
         //TODO Send mission to client
 
-        const packages = await PackageRepository.getAllByState(Constants.PackageState.available);
+        const packages = await PackageRepository.getPortablesByUnits(userCapacity.weight, userCapacity.pieces);
 
         res.send({
             status: ResponseHelpers.getBasicResponseObject(Constants.SuccessInfo),
-            packages: _.slice(packages, 0, 3),
+            packages: packages,
             gatheringPoint: Constants.GATHERING_POINT_COORDINATES
         });
 
