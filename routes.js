@@ -15,7 +15,7 @@ const ParameterValidator = require('./middlewares/parameterValidator');
 
 Router.post('/user/login', UserController.validateLogin, ParameterValidator.validate, UserController.login);
 
-Router.post('/user/check', Authenticator.authenticate, UserController.check);
+Router.post('/user/check', Authenticator.authenticate, UserController.validateLogin, ParameterValidator.validate, UserController.check);
 
 Router.get('/package/list', PackageController.list);
 

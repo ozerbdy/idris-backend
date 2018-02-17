@@ -25,11 +25,16 @@ module.exports.login = async (req, res) => {
         }
     });
 };
-
-module.exports.validateLogin = function(req, res, next){
+module.exports.validateCheck = function(req, res, next){
     res.locals.schema = {
-        username: Joi.string().required(),
-        password: Joi.string().required()
+        coordinates: Joi.object().keys({
+            latitude: Joi.number().min(0).max(90).required(),
+            longitude: Joi.number().min(-180).max(180).required()
+        }),
+        capacity: Joi.object().keys({
+            weight: Joi.number().positive().required(),
+            pieces: Joi.number().integer().positive().required()
+        })
     };
     next();
 };
