@@ -1,6 +1,7 @@
-const UserRepository = require('../db/UserRepository'),
-    ResponseHelpers = require('../helpers/responseHelpers'),
-    Constants = require('../constants/constants');
+const Joi = require('joi');
+const UserRepository = require('../db/UserRepository');
+const ResponseHelpers = require('../helpers/responseHelpers');
+const Constants = require('../constants/constants');
 
 module.exports.validateLogin = function(req, res, next){
     req.body.schema = {
