@@ -5,6 +5,8 @@ const Promise = require('bluebird'),
     GoogleMapsClient = require('../helpers/googleMapsHelpers').client,
     Constants = require('../constants/constants');
 
+
+
 module.exports.apply = async (req, res) => {
 
     const user = req.user;
@@ -28,52 +30,19 @@ module.exports.apply = async (req, res) => {
             return GoogleMapsClient.distanceMatrix(distanceQuery).asPromise();
         });
 
-        if(distanceResults.length !== packages.length) throw new Error('Distance results do not match');
-
         _.forEach(packages, (eachPackage, packageIndex) => {
             distanceResults[packageIndex].package = eachPackage;
         });
 
-        const filteredDistanceResults = _.filter(distanceResults, (distanceResultObject)=>{
-            const resultStatus = distanceResultObject.json.rows[0].elements[0].status;
-            return resultStatus ===  Constants.GOOGLE_MAPS_STATUS.ok && resultStatus !== Constants.GOOGLE_MAPS_STATUS.noResult;
-        });
+        const filteredDistanceResults = removeFailedResults(distanceResults);
 
-        const packageDistancesArray = _.map(filteredDistanceResults, (distanceResultObject)=>{
-            const distanceJSON = distanceResultObject.json;
-            const eachPackage = distanceResultObject.package;
-            const elements = distanceJSON.rows[0].elements[0];
-            const distance = elements.distance.value;
-            const duration = elements.duration.value;
-            return {
-                package: eachPackage,
-                travel: {
-                    distance: distance,
-                    duration: duration
-                }
-            };
-        });
+        const packageDistancesArray = keepRelevantData(filteredDistanceResults);
 
-        const packagesDistancesArraySortedByDuration = _.sortBy(packageDistancesArray,(packageDistanceObject) => {
-            return packageDistanceObject.travel.duration;
-        });
+        const packagesDistancesArraySortedByDuration = sortByTravelDuration(packageDistancesArray);
 
-        let packagesToCarry = [];
         let userRemainingWeight = userCapacity.weight;
         let userRemainingNumberOfPieces = userCapacity.pieces;
-
-        _.each(packagesDistancesArraySortedByDuration, (packageDistance) => {
-            const packageWeight = packageDistance.package.capacity.weight;
-            const packagePieces = packageDistance.package.capacity.pieces;
-            if(userRemainingWeight - packageWeight >= 0 && userRemainingWeight - packagePieces >= 0){
-                packagesToCarry.push(packageDistance);
-                userRemainingWeight -= packageWeight;
-                userRemainingNumberOfPieces -= packagePieces;
-            }else{
-                return false; //Exit iteration!
-            }
-
-        });
+        const packagesToCarry = getPackagesInCarryLimits(packagesDistancesArraySortedByDuration, userRemainingWeight, userRemainingNumberOfPieces);
 
         return res.send({
             status: ResponseHelpers.getBasicResponseObject(Constants.SuccessInfo),
@@ -85,3 +54,52 @@ module.exports.apply = async (req, res) => {
         console.error(err);
     }
 };
+
+function sortByTravelDuration(packageDistancesArray){
+    return _.sortBy(packageDistancesArray,(packageDistanceObject) => {
+        return packageDistanceObject.travel.duration;
+    });
+}
+
+function keepRelevantData(distanceResults){
+    return _.map(distanceResults, (distanceResultObject)=>{
+        const distanceJSON = distanceResultObject.json;
+        const eachPackage = distanceResultObject.package;
+        const elements = distanceJSON.rows[0].elements[0];
+        const distance = elements.distance.value;
+        const duration = elements.duration.value;
+        return {
+            package: eachPackage,
+            travel: {
+                distance: distance,
+                duration: duration
+            }
+        };
+    });
+}
+
+function removeFailedResults(distanceResults){
+    return _.filter(distanceResults, (distanceResultObject)=>{
+        const resultStatus = distanceResultObject.json.rows[0].elements[0].status;
+        return resultStatus ===  Constants.GOOGLE_MAPS_STATUS.ok && resultStatus !== Constants.GOOGLE_MAPS_STATUS.noResult;
+    });
+}
+
+function getPackagesInCarryLimits(sortedPackages, weightLimit, pieceLimit){
+    let packagesToCarry = [];
+    let userRemainingWeight = weightLimit;
+    let userRemainingNumberOfPieces = pieceLimit;
+
+    _.each(sortedPackages, (packageDistance) => {
+        const packageWeight = packageDistance.package.capacity.weight;
+        const packagePieces = packageDistance.package.capacity.pieces;
+        if(userRemainingWeight - packageWeight >= 0 && userRemainingWeight - packagePieces >= 0){
+            packagesToCarry.push(packageDistance);
+            userRemainingWeight -= packageWeight;
+            userRemainingNumberOfPieces -= packagePieces;
+        }else{
+            return false; //Exit iteration!
+        }
+    });
+    return packagesToCarry;
+}
