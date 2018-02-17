@@ -1,6 +1,11 @@
-const PackageRepository = require('../db/PackageRepository'),
-    ResponseHelpers = require('../helpers/responseHelpers'),
-    Constants = require('../constants/constants');
+const _ = require('lodash');
+const is = require('is_js');
+const Joi = require('Joi');
+const TypeHelpers = require('../helpers/typeHelpers');
+const PackageRepository = require('../db/PackageRepository');
+const ResponseHelpers = require('../helpers/responseHelpers');
+const TransportationRepository = require('../db/TransportationRepository');
+const Constants = require('../constants/constants');
 
 module.exports.list = async (req, res) => {
     const packages = await PackageRepository.getAll();
@@ -8,4 +13,52 @@ module.exports.list = async (req, res) => {
         status: ResponseHelpers.getBasicResponseObject(Constants.SuccessInfo),
         packages: packages
     });
+};
+
+module.exports.validatePickUp = function(req, res, next){
+    req.body.schema = {
+        packageId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required()
+    };
+    next();
+};
+module.exports.pickUp = async (req, res) => {
+    const user = req.user;
+    const userId = user._id;
+    const packageId = req.body.packageId;
+
+    try{
+        const transportation = await TransportationRepository.getAssigned(userId);
+        if(TypeHelpers.isNotEmptyObject(transportation) && TypeHelpers.isNotEmptyArray(transportation.packages)){
+            const packages = transportation.packages;
+            let claimIndex = 0;
+            const isSync = _.every(packages, (eachPackage, packageIndex) => {
+                if(eachPackage._id === packageId && eachPackage.state === Constants.PackageState.claimed){
+                    claimIndex = packageIndex;
+                    return true;
+                }
+                else if( eachPackage.state === Constants.PackageState.beingCarried){
+                    return true;
+                }
+                return false
+            });
+            if(isSync){//Happy path
+                packages[claimIndex].state = Constants.PackageState.beingCarried;
+
+                await Promise.all([
+                    PackageRepository.updateState(packageId, Constants.PackageState.beingCarried),
+                    TransportationRepository.updatePackageStatuses(userId, packages)
+                ]);
+                return ResponseHelpers.sendBasicResponse(res, Constants.SuccessInfo);
+            }else{
+                return ResponseHelpers.sendBasicResponse(res, Constants.ErrorInfo.Transportation.WrongPickUpOrder);
+            }
+        }else{
+            return ResponseHelpers.sendBasicResponse(res, Constants.ErrorInfo.Transportation.NotFound);
+        }
+    }catch(err){
+        return ResponseHelpers.sendBasicResponse(res, Constants.ErrorInfo.MongoError, err);
+
+    }
+
+
 };
