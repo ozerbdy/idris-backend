@@ -60,7 +60,8 @@ module.exports.apply = async (req, res) => {
         let userRemainingNumberOfPieces = userCapacity.pieces;
         let packagesToCarry = getPackagesInCarryLimits(packagesDistancesArraySortedByDuration, userRemainingWeight, userRemainingNumberOfPieces);
         packagesToCarry = _.map(packagesToCarry, (packageToCarry) => {
-            packageToCarry.state = Constants.PackageState.claimed
+            packageToCarry.state = Constants.PackageState.claimed;
+            return packageToCarry;
         });
 
         const packageObjectIds = _.map(packagesToCarry, (packageToCarry) => {
