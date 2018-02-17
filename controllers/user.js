@@ -26,6 +26,13 @@ module.exports.login = async (req, res) => {
     });
 };
 
+module.exports.validateLogin = function(req, res, next){
+    res.locals.schema = {
+        username: Joi.string().required(),
+        password: Joi.string().required()
+    };
+    next();
+};
 module.exports.check = async (req, res) => {
     const user = req.user;
     const userId = user._id.toString();
