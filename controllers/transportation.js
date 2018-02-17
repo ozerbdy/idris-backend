@@ -1,6 +1,7 @@
 const Promise = require('bluebird'),
     _ = require('lodash'),
     PackageRepository = require('../db/PackageRepository'),
+    TransportationRepository = require('../db/TransportationRepository'),
     ResponseHelpers = require('../helpers/responseHelpers'),
     GoogleMapsClient = require('../helpers/googleMapsHelpers').client,
     Constants = require('../constants/constants');
@@ -8,18 +9,12 @@ const Promise = require('bluebird'),
 
 
 module.exports.apply = async (req, res) => {
-
     const user = req.user;
+    const userId = user._id;
     const userCoordinates = user.coordinates;
     const userCapacity = user.capacity;
     console.log('User Capacty', userCapacity);
     try{
-        //TODO Get only relevant packages according to weight and space capacity of user from db (DONE)
-        //TODO Then sort the relevant packages by distances (DONE)
-        //TODO Create and store transportation mission (IN PROGRESS)
-        //TODO Mark packages as claimed for not them to be picked by another user
-        //TODO Send mission to client
-
         const packages = await PackageRepository.getPortablesByUnits(userCapacity.weight, userCapacity.pieces);
 
         const distanceResults = await Promise.map(packages, (eachPackage) => {
@@ -43,6 +38,15 @@ module.exports.apply = async (req, res) => {
         let userRemainingWeight = userCapacity.weight;
         let userRemainingNumberOfPieces = userCapacity.pieces;
         const packagesToCarry = getPackagesInCarryLimits(packagesDistancesArraySortedByDuration, userRemainingWeight, userRemainingNumberOfPieces);
+
+        const packageObjectIds = _.map(packagesToCarry, (packageToCarry) => {
+            return packageToCarry._id;
+        });
+
+        await Promise.all([
+            PackageRepository.updateStates(packageObjectIds, Constants.PackageState.claimed),
+            TransportationRepository.add(userId, packageObjectIds)
+        ]);
 
         return res.send({
             status: ResponseHelpers.getBasicResponseObject(Constants.SuccessInfo),
