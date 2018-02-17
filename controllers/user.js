@@ -2,6 +2,13 @@ const UserRepository = require('../db/UserRepository'),
     ResponseHelpers = require('../helpers/responseHelpers'),
     Constants = require('../constants/constants');
 
+module.exports.validateLogin = function(req, res, next){
+    req.body.schema = {
+        username: Joi.string().required(),
+        password: Joi.string().required()
+    };
+    next();
+};
 module.exports.login = async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;

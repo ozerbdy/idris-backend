@@ -13,7 +13,7 @@ Router.get('/', (req, res) => {
 const Authenticator = require('./middlewares/authenticator');
 const ParameterValidator = require('./middlewares/parameterValidator');
 
-Router.post('/user/login', UserController.login);
+Router.post('/user/login', UserController.validateLogin, ParameterValidator.validate, UserController.login);
 
 Router.post('/user/check', Authenticator.authenticate, UserController.check);
 
