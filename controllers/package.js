@@ -32,7 +32,7 @@ module.exports.pickUp = async (req, res) => {
             const packages = transportation.packages;
             let claimIndex = 0;
             const isSync = _.every(packages, (eachPackage, packageIndex) => {
-                if(eachPackage._id === packageId && eachPackage.state === Constants.PackageState.claimed){
+                if(eachPackage._id.toString() === packageId && eachPackage.state === Constants.PackageState.claimed){
                     claimIndex = packageIndex;
                     return true;
                 }
