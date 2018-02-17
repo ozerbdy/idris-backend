@@ -4,7 +4,7 @@ const ResponseHelpers = require('../helpers/responseHelpers');
 const Constants = require('../constants/constants');
 
 module.exports.validateLogin = function(req, res, next){
-    req.body.schema = {
+    res.locals.schema = {
         username: Joi.string().required(),
         password: Joi.string().required()
     };

@@ -16,7 +16,7 @@ module.exports.list = async (req, res) => {
 };
 
 module.exports.validatePickUp = function(req, res, next){
-    req.body.schema = {
+    res.locals.schema = {
         packageId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required()
     };
     next();
