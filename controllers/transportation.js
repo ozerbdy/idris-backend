@@ -6,14 +6,11 @@ const Promise = require('bluebird'),
     GoogleMapsClient = require('../helpers/googleMapsHelpers').client,
     Constants = require('../constants/constants');
 
-
-
 module.exports.apply = async (req, res) => {
     const user = req.user;
     const userId = user._id;
     const userCoordinates = user.coordinates;
     const userCapacity = user.capacity;
-    console.log('User Capacty', userCapacity);
     try{
         const packages = await PackageRepository.getPortablesByUnits(userCapacity.weight, userCapacity.pieces);
 
