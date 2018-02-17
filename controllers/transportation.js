@@ -55,9 +55,10 @@ module.exports.apply = async (req, res) => {
     }
 };
 
-function sortByTravelDuration(packageDistancesArray){
-    return _.sortBy(packageDistancesArray,(packageDistanceObject) => {
-        return packageDistanceObject.travel.duration;
+function removeFailedResults(distanceResults){
+    return _.filter(distanceResults, (distanceResultObject)=>{
+        const resultStatus = distanceResultObject.json.rows[0].elements[0].status;
+        return resultStatus ===  Constants.GOOGLE_MAPS_STATUS.ok && resultStatus !== Constants.GOOGLE_MAPS_STATUS.noResult;
     });
 }
 
@@ -68,20 +69,18 @@ function keepRelevantData(distanceResults){
         const elements = distanceJSON.rows[0].elements[0];
         const distance = elements.distance.value;
         const duration = elements.duration.value;
-        return {
-            package: eachPackage,
-            travel: {
-                distance: distance,
-                duration: duration
-            }
+        eachPackage.travel = {
+            distance: distance,
+            duration: duration
         };
+        eachPackage.address = distanceJSON.destination_addresses[0];
+        return eachPackage;
     });
 }
 
-function removeFailedResults(distanceResults){
-    return _.filter(distanceResults, (distanceResultObject)=>{
-        const resultStatus = distanceResultObject.json.rows[0].elements[0].status;
-        return resultStatus ===  Constants.GOOGLE_MAPS_STATUS.ok && resultStatus !== Constants.GOOGLE_MAPS_STATUS.noResult;
+function sortByTravelDuration(packageDistancesArray){
+    return _.sortBy(packageDistancesArray,(packageDistanceObject) => {
+        return packageDistanceObject.travel.duration;
     });
 }
 
@@ -91,8 +90,8 @@ function getPackagesInCarryLimits(sortedPackages, weightLimit, pieceLimit){
     let userRemainingNumberOfPieces = pieceLimit;
 
     _.each(sortedPackages, (packageDistance) => {
-        const packageWeight = packageDistance.package.capacity.weight;
-        const packagePieces = packageDistance.package.capacity.pieces;
+        const packageWeight = packageDistance.capacity.weight;
+        const packagePieces = packageDistance.capacity.pieces;
         if(userRemainingWeight - packageWeight >= 0 && userRemainingWeight - packagePieces >= 0){
             packagesToCarry.push(packageDistance);
             userRemainingWeight -= packageWeight;
