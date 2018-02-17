@@ -32,3 +32,18 @@ module.exports.getPortablesByUnits = (maxWeight, maxNumOfPieces) => {
 
     return this.get(query);
 };
+
+module.exports.updateStates = (ids, toState) => {
+    const query = {
+        _id: {$in: ids}
+    };
+
+    const update = {
+        $set: {
+            state: toState
+        }
+    };
+
+    return mongo.client.collection(CollectionName)
+        .updateMany(query, update);
+};
