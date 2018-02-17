@@ -3,7 +3,7 @@ const mongo = require('./mongo'),
     is = require('is_js'),
     Constants = require('../constants/constants');
 
-const CollectionName = Constants.CollectionNames.packages;
+const CollectionName = Constants.CollectionName.packages;
 
 module.exports.get = function(){
     const query = {};

@@ -3,7 +3,7 @@ const mongo = require('./mongo'),
     is = require('is_js'),
     Constants = require('../constants/constants');
 
-const CollectionName = Constants.CollectionNames.users;
+const CollectionName = Constants.CollectionName.users;
 
 module.exports.getToken = function(username, password){
     const query = {

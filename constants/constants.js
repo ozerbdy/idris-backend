@@ -14,7 +14,7 @@ module.exports.SuccessInfo = {
     code: 0
 };
 
-module.exports.CollectionNames = {
+module.exports.CollectionName = {
     users: 'users',
     packages: 'packages',
     transportations: 'transportations'
