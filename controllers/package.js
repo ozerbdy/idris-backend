@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const is = require('is_js');
 const Joi = require('joi');
+const Promise = require('bluebird');
 const TypeHelpers = require('../helpers/typeHelpers');
 const PackageRepository = require('../db/PackageRepository');
 const ResponseHelpers = require('../helpers/responseHelpers');
@@ -44,11 +45,16 @@ module.exports.pickUp = async (req, res) => {
             if(isSync){//Happy path
                 packages[claimIndex].state = Constants.PackageState.beingCarried;
 
-                await Promise.all([
+                const [packageUpdateResult, transactionUpdateResult] = await Promise.all([
                     PackageRepository.updateState(packageId, Constants.PackageState.beingCarried),
                     TransportationRepository.updatePackageStatuses(userId, packages)
                 ]);
-                return ResponseHelpers.sendBasicResponse(res, Constants.SuccessInfo);
+
+                return res.send({
+                    status: ResponseHelpers.getBasicResponseObject(Constants.SuccessInfo),
+                    package: packageUpdateResult.value
+                });
+
             }else{
                 return ResponseHelpers.sendBasicResponse(res, Constants.ErrorInfo.Transportation.WrongPickUpOrder);
             }
@@ -57,7 +63,6 @@ module.exports.pickUp = async (req, res) => {
         }
     }catch(err){
         return ResponseHelpers.sendBasicResponse(res, Constants.ErrorInfo.MongoError, err);
-
     }
 
 

@@ -1,6 +1,7 @@
 const mongo = require('./mongo'),
     ObjectId = require('mongodb').ObjectId,
     is = require('is_js'),
+    TypeHelper = require('../helpers/typeHelpers'),
     Constants = require('../constants/constants');
 
 const CollectionName = Constants.CollectionName.packages;
@@ -60,5 +61,16 @@ module.exports.updateStates = (ids, toState) => {
 };
 
 module.exports.updateState = (id, toState) => {
-    return this.updateStates([id], toState);
+    const query = {
+        _id: TypeHelper.objectIdfy(id)
+    };
+
+    const update = {
+        $set : {
+            state: toState
+        }
+    };
+
+    return mongo.client.collection(CollectionName)
+        .findOneAndUpdate(query, update, {returnOriginal: false});
 };
