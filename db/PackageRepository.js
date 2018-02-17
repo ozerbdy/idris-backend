@@ -23,6 +23,17 @@ module.exports.getAllByState = (byState) => {
     return this.get(query);
 };
 
+module.exports.getByIds = (ids) => {
+    const query = {
+        _id: {$in : ids}
+    };
+    return this.get(query);
+};
+
+module.exports.getById = (id) => {
+    return this.getByIds([id]);
+};
+
 module.exports.getPortablesByUnits = (maxWeight, maxNumOfPieces) => {
     const query = {
         state: Constants.PackageState.available,
