@@ -58,7 +58,10 @@ module.exports.apply = async (req, res) => {
 
         let userRemainingWeight = userCapacity.weight;
         let userRemainingNumberOfPieces = userCapacity.pieces;
-        const packagesToCarry = getPackagesInCarryLimits(packagesDistancesArraySortedByDuration, userRemainingWeight, userRemainingNumberOfPieces);
+        let packagesToCarry = getPackagesInCarryLimits(packagesDistancesArraySortedByDuration, userRemainingWeight, userRemainingNumberOfPieces);
+        packagesToCarry = _.map(packagesToCarry, (packageToCarry) => {
+            packageToCarry.state = Constants.PackageState.claimed
+        });
 
         const packageObjectIds = _.map(packagesToCarry, (packageToCarry) => {
             return packageToCarry._id;
