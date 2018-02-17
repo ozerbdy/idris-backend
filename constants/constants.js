@@ -33,3 +33,8 @@ module.exports.GATHERING_POINT_COORDINATES = {
 };
 
 module.exports.TOKEN_REQUEST_HEADER_NAME = 'token';
+
+module.exports.GOOGLE_MAPS_STATUS = {
+    ok: 'OK',
+    noResult: 'ZERO_RESULTS'
+};
