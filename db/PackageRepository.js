@@ -47,3 +47,7 @@ module.exports.updateStates = (ids, toState) => {
     return mongo.client.collection(CollectionName)
         .updateMany(query, update);
 };
+
+module.exports.updateState = (id, toState) => {
+    return this.updateStates([id], toState);
+};
