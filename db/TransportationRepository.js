@@ -5,11 +5,11 @@ const mongo = require('./mongo'),
 
 const CollectionName = Constants.CollectionName.transportations;
 
-module.exports.add = function(userId, packageObjectIds){
+module.exports.add = function(userId, packageObjects){
     const query = {
         userId: userId,
         applicationDate: new Date(),
-        packageIds: packageObjectIds,
+        packages: packageObjects,
         state: Constants.TransportationState.assigned
     };
 

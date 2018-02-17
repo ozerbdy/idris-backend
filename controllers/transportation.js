@@ -40,9 +40,16 @@ module.exports.apply = async (req, res) => {
             return packageToCarry._id;
         });
 
+        const packageTransportationObjects = _.map(packageObjectIds, (packageObjectId) => {
+            return {
+                _id: packageObjectId,
+                state: Constants.PackageState.claimed
+            };
+        });
+
         await Promise.all([
             PackageRepository.updateStates(packageObjectIds, Constants.PackageState.claimed),
-            TransportationRepository.add(userId, packageObjectIds)
+            TransportationRepository.add(userId, packageTransportationObjects)
         ]);
 
         return res.send({
