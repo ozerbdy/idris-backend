@@ -20,5 +20,12 @@ module.exports.CollectionName = {
     transportations: 'transportations'
 };
 
+module.exports.PackageState = {
+    available: 'available',
+    claimed: 'claimed',
+    beingCarried: 'beingCarried',
+    delivered: 'delivered'
+};
+
 
 module.exports.TOKEN_REQUEST_HEADER_NAME = 'token';
