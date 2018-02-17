@@ -37,7 +37,7 @@ module.exports.pickUp = async (req, res) => {
                     claimIndex = packageIndex;
                     return true;
                 }
-                else if(eachPackage.state === Constants.PackageState.beingCarried){
+                else if(eachPackage.state === Constants.PackageState.beingCarried || eachPackage.state === Constants.PackageState.claimed){
                     return true;
                 }
                 return false
