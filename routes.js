@@ -11,12 +11,15 @@ Router.get('/', (req, res) => {
 });
 
 const Authenticator = require('./middlewares/authenticator');
+const ParameterValidator = require('./middlewares/parameterValidator');
 
 Router.post('/user/login', UserController.login);
 
 Router.post('/user/check', Authenticator.authenticate, UserController.check);
 
 Router.get('/package/list', PackageController.list);
+
+Router.post('/package/pickUp', Authenticator.authenticate, PackageController.validatePickUp, ParameterValidator.validate, PackageController.pickUp);
 
 Router.post('/transportation/apply', Authenticator.authenticate, TransportationController.apply);
 
