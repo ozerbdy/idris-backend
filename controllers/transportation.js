@@ -45,8 +45,9 @@ module.exports.finish = async (req, res) => {
 
             if(isAllBeingCarried){
                 const delieveredPackages = markPackagesAsDelivered(packageObjects);
-                const packageIds = _.map(delieveredPackages, (packageId) => {
-                    return TypeHelpers.objectIdfy(packageId);
+                const packageIds = _.map(delieveredPackages, (deliveredPackage) => {
+                    return deliveredPackage._id;
+
                 });
                 await Promise.all([
                     TransportationRepository.finish(userId, delieveredPackages),
