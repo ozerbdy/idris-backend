@@ -6,6 +6,7 @@ const mongo = require('./mongo'),
 const CollectionName = Constants.CollectionName.packages;
 
 module.exports.get = (query) => {
+    query = query || {};
     return mongo.client.collection(CollectionName)
         .find(query).toArray();
 };
@@ -19,5 +20,15 @@ module.exports.getAllByState = (byState) => {
     const query = {
         state: byState
     };
+    return this.get(query);
+};
+
+module.exports.getPortablesByUnits = (maxWeight, maxNumOfPieces) => {
+    const query = {
+        state: Constants.PackageState.available,
+        'capacity.weight' : {$lte: maxWeight},
+        'capacity.pieces' : {$lte: maxNumOfPieces},
+    };
+
     return this.get(query);
 };
