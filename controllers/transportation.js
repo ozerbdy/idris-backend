@@ -1,5 +1,6 @@
 const Promise = require('bluebird');
 const _ = require('lodash');
+const Joi = require('joi');
 const TypeHelpers = require('../helpers/typeHelpers');
 const UserRepository = require('../db/UserRepository');
 const PackageRepository = require('../db/PackageRepository');
@@ -31,6 +32,15 @@ module.exports.get = async (req, res) => {
     }
 };
 
+module.exports.validateApply = function(req, res, next){
+    res.locals.schema = {
+        coordinates: Joi.object().keys({
+            latitude: Joi.number().min(0).max(90).required(),
+            longitude: Joi.number().min(-180).max(180).required()
+        })
+    };
+    next();
+};
 module.exports.apply = async (req, res) => {
     const user = res.locals.user;
     const userId = user._id;

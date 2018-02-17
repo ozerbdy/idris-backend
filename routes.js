@@ -23,6 +23,6 @@ Router.post('/package/pickUp', Authenticator.authenticate, PackageController.val
 
 Router.get('/transportation/get', Authenticator.authenticate, TransportationController.get);
 
-Router.post('/transportation/apply', Authenticator.authenticate, TransportationController.apply);
+Router.post('/transportation/apply', Authenticator.authenticate, TransportationController.validateApply, ParameterValidator.validate, TransportationController.apply);
 
 module.exports = Router;
