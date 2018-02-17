@@ -32,6 +32,42 @@ module.exports.get = async (req, res) => {
     }
 };
 
+module.exports.finish = async (req, res) => {
+    const user = res.locals.user;
+    const userId = user._id;
+    try{
+        const transportation = await TransportationRepository.getAssigned(userId);
+        if(TypeHelpers.isNotEmptyObject(transportation)){
+            const packageObjects = transportation.packages;
+            const isAllBeingCarried = _.every(packageObjects, (packageObject) => {
+                return packageObject.state === Constants.PackageState.beingCarried;
+            });
+
+            if(isAllBeingCarried){
+                const delieveredPackages = markPackagesAsDelivered(packageObjects);
+                const packageIds = _.map(delieveredPackages, (packageId) => {
+                    return packageId;
+                });
+                await Promise.all([
+                    TransportationRepository.finish(userId, delieveredPackages),
+                    PackageRepository.updateStates(packageIds, Constants.PackageState.delivered)
+                ]);
+            }
+            return ResponseHelpers.sendBasicResponse(res, Constants.ErrorInfo.Transportation.CannotFinishYet);
+        }
+        return ResponseHelpers.sendBasicResponse(res, Constants.ErrorInfo.Transportation.NotFound);
+    }catch(err){
+        return ResponseHelpers.sendBasicResponse(res, Constants.ErrorInfo.MongoError, err);
+    }
+};
+
+function markPackagesAsDelivered(packageObjects){
+    return _.map(packageObjects, (packageObject) => {
+        packageObject.state = Constants.PackageState.delivered;
+        return packageObject;
+    });
+}
+
 module.exports.validateApply = function(req, res, next){
     res.locals.schema = {
         coordinates: Joi.object().keys({

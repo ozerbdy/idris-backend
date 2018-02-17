@@ -42,3 +42,20 @@ module.exports.updatePackageStatuses = (userId, newPackageStatuses) => {
     return mongo.client.collection(CollectionName)
         .updateOne(query, update);
 };
+
+module.exports.finish = (userId, newPackageStatuses) => {
+    const query = {
+        userId: userId,
+        state: Constants.TransportationState.assigned
+    };
+
+    const update = {
+        $set: {
+            state: Constants.TransportationState.finished,
+            packages: newPackageStatuses
+        }
+    };
+
+    return mongo.client.collection(CollectionName)
+        .findOneAndUpdate(query, update);
+};
