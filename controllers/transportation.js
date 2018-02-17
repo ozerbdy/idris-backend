@@ -1,10 +1,34 @@
-const Promise = require('bluebird'),
-    _ = require('lodash'),
-    PackageRepository = require('../db/PackageRepository'),
-    TransportationRepository = require('../db/TransportationRepository'),
-    ResponseHelpers = require('../helpers/responseHelpers'),
-    GoogleMapsClient = require('../helpers/googleMapsHelpers').client,
-    Constants = require('../constants/constants');
+const Promise = require('bluebird');
+const _ = require('lodash');
+const TypeHelpers = require('../helpers/typeHelpers');
+const PackageRepository = require('../db/PackageRepository');
+const TransportationRepository = require('../db/TransportationRepository');
+const GoogleMapsClient = require('../helpers/googleMapsHelpers').client;
+const ResponseHelpers = require('../helpers/responseHelpers');
+const Constants = require('../constants/constants');
+
+module.exports.get = async (req, res) => {
+    const user = res.locals.user;
+    const userId = user._id;
+
+    try{
+        let transportation = await TransportationRepository.getAssigned(userId);
+        if(TypeHelpers.isNotEmptyObject(transportation)){
+            const packageIds = _.map(transportation.packages, (packageObject) => {
+                return packageObject._id;
+            });
+            const packages = await PackageRepository.getByIds(packageIds);
+            return res.send({
+                status: ResponseHelpers.getBasicResponseObject(Constants.SuccessInfo),
+                packages: packages,
+                gatheringPoint: Constants.GATHERING_POINT_COORDINATES
+            });
+        }
+        return ResponseHelpers.sendBasicResponse(res, Constants.ErrorInfo.MongoError);
+    }catch(err){
+        return ResponseHelpers.sendBasicResponse(res, Constants.ErrorInfo.MongoError, err);
+    }
+};
 
 module.exports.apply = async (req, res) => {
     const user = res.locals.user;
@@ -59,7 +83,7 @@ module.exports.apply = async (req, res) => {
         });
 
     }catch(err){
-        console.error(err);
+        return ResponseHelpers.sendBasicResponse(res, Constants.ErrorInfo.MongoError, err);
     }
 };
 

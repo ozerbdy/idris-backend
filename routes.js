@@ -21,6 +21,8 @@ Router.get('/package/list', PackageController.list);
 
 Router.post('/package/pickUp', Authenticator.authenticate, PackageController.validatePickUp, ParameterValidator.validate, PackageController.pickUp);
 
+Router.get('/transportation/get', Authenticator.authenticate, TransportationController.get);
+
 Router.post('/transportation/apply', Authenticator.authenticate, TransportationController.apply);
 
 module.exports = Router;
