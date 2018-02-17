@@ -12,3 +12,9 @@ module.exports.getBasicResponseObject = function(ResponseType, extraMessage){
     if (extraMessage) response.message += '; ' + extraMessage;
     return response;
 };
+
+module.exports.sendBasicResponse = (res, ResponseType, extraMessage) => {
+    return res.send({
+        status: this.getBasicResponseObject(ResponseType, extraMessage)
+    });
+};
