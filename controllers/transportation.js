@@ -83,60 +83,63 @@ module.exports.apply = async (req, res) => {
     const userCoordinates = req.body.coordinates;
     const userCapacity = user.capacity;
     try{
-        const packages = await PackageRepository.getPortablesByUnits(userCapacity.weight, userCapacity.pieces);
-        const distanceResults = await Promise.map(packages, (eachPackage) => {
-            const distanceQuery = {
-                origins: userCoordinates,
-                destinations: eachPackage.coordinates
-            };
-            return GoogleMapsClient.distanceMatrix(distanceQuery).asPromise();
-        });
+        const transportation = await TransportationRepository.getAssigned(userId);
+        if(!TypeHelpers.isNotEmptyObject(transportation)){
+            const packages = await PackageRepository.getPortablesByUnits(userCapacity.weight, userCapacity.pieces);
+            const distanceResults = await Promise.map(packages, (eachPackage) => {
+                const distanceQuery = {
+                    origins: userCoordinates,
+                    destinations: eachPackage.coordinates
+                };
+                return GoogleMapsClient.distanceMatrix(distanceQuery).asPromise();
+            });
 
-        _.forEach(packages, (eachPackage, packageIndex) => {
-            distanceResults[packageIndex].package = eachPackage;
-        });
+            _.forEach(packages, (eachPackage, packageIndex) => {
+                distanceResults[packageIndex].package = eachPackage;
+            });
 
-        const filteredDistanceResults = removeFailedResults(distanceResults);
+            const filteredDistanceResults = removeFailedResults(distanceResults);
 
-        const packageDistancesArray = keepRelevantData(filteredDistanceResults);
+            const packageDistancesArray = keepRelevantData(filteredDistanceResults);
 
-        const packagesDistancesArraySortedByDuration = sortByTravelDuration(packageDistancesArray);
+            const packagesDistancesArraySortedByDuration = sortByTravelDuration(packageDistancesArray);
 
-        let userRemainingWeight = userCapacity.weight;
-        let userRemainingNumberOfPieces = userCapacity.pieces;
-        let packagesToCarry = getPackagesInCarryLimits(packagesDistancesArraySortedByDuration, userRemainingWeight, userRemainingNumberOfPieces);
-        packagesToCarry = _.map(packagesToCarry, (packageToCarry) => {
-            packageToCarry.state = Constants.PackageState.claimed;
-            return packageToCarry;
-        });
+            let userRemainingWeight = userCapacity.weight;
+            let userRemainingNumberOfPieces = userCapacity.pieces;
+            let packagesToCarry = getPackagesInCarryLimits(packagesDistancesArraySortedByDuration, userRemainingWeight, userRemainingNumberOfPieces);
+            packagesToCarry = _.map(packagesToCarry, (packageToCarry) => {
+                packageToCarry.state = Constants.PackageState.claimed;
+                return packageToCarry;
+            });
 
-        const packageObjectIds = _.map(packagesToCarry, (packageToCarry) => {
-            return packageToCarry._id;
-        });
+            const packageObjectIds = _.map(packagesToCarry, (packageToCarry) => {
+                return packageToCarry._id;
+            });
 
-        await Promise.map(packagesToCarry, (packageToCarry) => {
-            return PackageRepository.updateAddress(packageToCarry._id, packageToCarry.address);
-        });
+            await Promise.map(packagesToCarry, (packageToCarry) => {
+                return PackageRepository.updateAddress(packageToCarry._id, packageToCarry.address);
+            });
 
-        const packageTransportationObjects = _.map(packageObjectIds, (packageObjectId) => {
-            return {
-                _id: packageObjectId,
-                state: Constants.PackageState.claimed
-            };
-        });
+            const packageTransportationObjects = _.map(packageObjectIds, (packageObjectId) => {
+                return {
+                    _id: packageObjectId,
+                    state: Constants.PackageState.claimed
+                };
+            });
 
-        await Promise.all([
-            UserRepository.updateCoordinates(userId, userCoordinates.latitude, userCoordinates.longitude),
-            PackageRepository.updateStates(packageObjectIds, Constants.PackageState.claimed),
-            TransportationRepository.add(userId, packageTransportationObjects)
-        ]);
+            await Promise.all([
+                UserRepository.updateCoordinates(userId, userCoordinates.latitude, userCoordinates.longitude),
+                PackageRepository.updateStates(packageObjectIds, Constants.PackageState.claimed),
+                TransportationRepository.add(userId, packageTransportationObjects)
+            ]);
 
-        return res.send({
-            status: ResponseHelpers.getBasicResponseObject(Constants.SuccessInfo),
-            packages: packagesToCarry,
-            gatheringPoint: Constants.GATHERING_POINT_COORDINATES
-        });
-
+            return res.send({
+                status: ResponseHelpers.getBasicResponseObject(Constants.SuccessInfo),
+                packages: packagesToCarry,
+                gatheringPoint: Constants.GATHERING_POINT_COORDINATES
+            });
+        }
+        return ResponseHelpers.sendBasicResponse(res, Constants.ErrorInfo.Transportation.AlreadyExists);
     }catch(err){
         return ResponseHelpers.sendBasicResponse(res, Constants.ErrorInfo.MongoError, err);
     }

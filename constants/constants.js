@@ -16,13 +16,17 @@ module.exports.ErrorInfo = {
             message: 'Transportation not found',
             code: 40
         },
-        WrongPickUpOrder:{
+        WrongPickUpOrder: {
             message: 'Wrong transportation pick up order',
             code: 41
         },
-        CannotFinishYet:{
+        CannotFinishYet: {
             message: 'Remaining packages to pick up, transportation cannot finish',
             code: 42
+        },
+        AlreadyExists: {
+            message: 'User is already applied for a transportation',
+            code: 43
         }
     }
 };
