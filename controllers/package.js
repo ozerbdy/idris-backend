@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const is = require('is_js');
-const Joi = require('Joi');
+const Joi = require('joi');
 const TypeHelpers = require('../helpers/typeHelpers');
 const PackageRepository = require('../db/PackageRepository');
 const ResponseHelpers = require('../helpers/responseHelpers');
