@@ -35,10 +35,6 @@ module.exports.updateCoordinates = function(userId, latitude, longitude){
             coordinates : {
                 latitude: latitude,
                 longitude: longitude
-            },
-            capacity: {
-                weight: weightCapacity,
-                pieces: piecesCapacity
             }
         }
     };
