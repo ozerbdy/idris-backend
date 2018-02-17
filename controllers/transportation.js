@@ -20,7 +20,8 @@ module.exports.apply = async (req, res) => {
 
         res.send({
             status: ResponseHelpers.getBasicResponseObject(Constants.SuccessInfo),
-            packages: _.slice(packages, 0, 3)
+            packages: _.slice(packages, 0, 3),
+            gatheringPoint: Constants.GATHERING_POINT_COORDINATES
         });
 
         const distanceResults = await Promise.map(packages, (eachPackage) => {

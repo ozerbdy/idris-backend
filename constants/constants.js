@@ -27,5 +27,9 @@ module.exports.PackageState = {
     delivered: 'delivered'
 };
 
+module.exports.GATHERING_POINT_COORDINATES = {
+    latitude: 41.0571701,
+    longitude: 29.0124413
+};
 
 module.exports.TOKEN_REQUEST_HEADER_NAME = 'token';
