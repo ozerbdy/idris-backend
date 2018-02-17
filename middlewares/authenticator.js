@@ -8,7 +8,7 @@ module.exports.authenticate = async (req, res, next) => {
     const token = req.get(Constants.TOKEN_REQUEST_HEADER_NAME);
     const user = await UserRepository.get(token);
     if(is.existy(user)){
-        req.user = user;
+        res.locals.user = user;
         next();
     }else{
         return res.send({

@@ -7,7 +7,7 @@ const Promise = require('bluebird'),
     Constants = require('../constants/constants');
 
 module.exports.apply = async (req, res) => {
-    const user = req.user;
+    const user = res.locals.user;
     const userId = user._id;
     const userCoordinates = user.coordinates;
     const userCapacity = user.capacity;

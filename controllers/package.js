@@ -22,7 +22,7 @@ module.exports.validatePickUp = function(req, res, next){
     next();
 };
 module.exports.pickUp = async (req, res) => {
-    const user = req.user;
+    const user = res.locals.user;
     const userId = user._id;
     const packageId = req.body.packageId;
 

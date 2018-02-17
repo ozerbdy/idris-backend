@@ -34,7 +34,7 @@ module.exports.validateLogin = function(req, res, next){
     next();
 };
 module.exports.check = async (req, res) => {
-    const user = req.user;
+    const user = res.locals.user;
     const userId = user._id.toString();
     const coordinates = req.body.coordinates;
     const latitude = coordinates.latitude;
