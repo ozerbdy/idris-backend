@@ -13,10 +13,11 @@ _Team Members:_
 - [Mustafa Besnili](https://github.com/mbesnili)
 # Technology Stack
 ### Backend
- - Node.js
- - MongoDB
+ - Node.js v9.4.0
+ - MongoDB v3.4
 ### Mobile Application
- - Swift
+ - Swift 4.0
+ - Xcode 9.2
 
 # Third Party Libraries
 
@@ -30,17 +31,18 @@ _Team Members:_
 
 ## iOS
 ##### *Networking*
-- [Alamofire]()
-- [Socket.IO-Client-Swift]()
+- [Alamofire](https://github.com/Alamofire/Alamofire)
+- [Socket.IO-Client-Swift](https://github.com/socketio/socket.io-client-swift)
 ##### *UI*
-- [Reusable]()
-- [Permission/Location]()
-- [NVActivityIndicatorView]()
+- [Reusable](https://github.com/AliSoftware/Reusable)
+- [Permission/Location](https://github.com/delba/Permission)
+- [NVActivityIndicatorView](https://github.com/ninjaprox/NVActivityIndicatorView)
 ##### *Utils*
-- [Marshal]()
-- [SwiftFormat/CLI]()
-- [DeepDiff]()
+- [Marshal](https://github.com/utahiosmac/Marshal)
+- [SwiftFormat/CLI](https://github.com/nicklockwood/SwiftFormat)
+- [DeepDiff](https://github.com/onmyway133/DeepDiff)
 ##### *Resources*
-- [R.swift]()
-- [UIFontComplete]()
-  
+- [R.swift](https://github.com/mac-cain13/R.swift)
+- [UIFontComplete](https://github.com/Nirma/UIFontComplete)
+
+ 
