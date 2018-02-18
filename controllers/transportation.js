@@ -34,8 +34,6 @@ module.exports.get = async (req, res) => {
 };
 
 module.exports.finish = async (req, res) => {
-
-    //TODO send package state updated socket event
     const user = res.locals.user;
     const userId = user._id;
     try{
@@ -56,6 +54,9 @@ module.exports.finish = async (req, res) => {
                     TransportationRepository.finish(userId, delieveredPackages),
                     PackageRepository.updateStates(packageIds, Constants.PackageState.delivered)
                 ]);
+                ResponseHelpers.sendBasicResponse(res, Constants.SuccessInfo);
+                const updatedPackages = await PackageRepository.getByIds(packageIds);
+                return SocketIOManager.broadcastOnlineExceptUser(userId, Constants.SocketEvent.packageStateChanged, updatedPackages);
             }
             return ResponseHelpers.sendBasicResponse(res, Constants.ErrorInfo.Transportation.CannotFinishYet);
         }
@@ -83,7 +84,6 @@ module.exports.validateApply = function(req, res, next){
 };
 module.exports.apply = async (req, res) => {
 
-    //TODO send packet state update socket event
     const user = res.locals.user;
     const userId = user._id;
     const userCoordinates = req.body.coordinates;
@@ -146,7 +146,7 @@ module.exports.apply = async (req, res) => {
             });
 
             const updatedPackages = await PackageRepository.getByIds(packageObjectIds);
-            SocketIOManager.broadcastOnlineExceptUser(userId, Constants.SocketEvent.packageStateChanged, updatedPackages);
+            return SocketIOManager.broadcastOnlineExceptUser(userId, Constants.SocketEvent.packageStateChanged, updatedPackages);
         }
         return ResponseHelpers.sendBasicResponse(res, Constants.ErrorInfo.Transportation.AlreadyExists);
     }catch(err){
