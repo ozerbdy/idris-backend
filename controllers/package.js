@@ -51,7 +51,7 @@ module.exports.pickUp = async (req, res) => {
                     TransportationRepository.updatePackageStatuses(userId, packages)
                 ]);
 
-                SocketIOManager.broadcastOnlineExceptUser(userId, Constants.SocketEvent.packageStateChanged, packageUpdateResult.value);
+                SocketIOManager.broadcastOnlineExceptUser(userId, Constants.SocketEvent.packageStateChanged, [packageUpdateResult.value]);
 
                 return res.send({
                     status: ResponseHelpers.getBasicResponseObject(Constants.SuccessInfo),
