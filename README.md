@@ -1,6 +1,9 @@
- # App Name
+ 
+ <img src="https://images2.imgbox.com/9e/aa/WadGkqOr_o.png" width="400">
+ 
+ # Beam
 
-App Name is an app in which delivery people see the status of packages to pick up in real time, apply for transportation mission and get navigation assistance.
+Beam is an app in which delivery people see the status of packages to pick up in real time, apply for transportation mission and get navigation assistance.
 
 **TEAM NAME: idris**
 
