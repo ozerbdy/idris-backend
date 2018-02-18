@@ -46,12 +46,10 @@ module.exports.emitEvent = function(eventName, data){
     }
 };
 
-module.exports.broadcastOnlineExceptUser = function(userId ,eventName, data){
-    if(clients[userId]){
-        const socket = clients[userId];
-        if(socket){
-            socket.broadcast.emit(eventName, data);
+module.exports.broadcastOnlineExceptUser = function(userId, eventName, data){
+    _.map(clients, (socket) => {
+        if(socket.userId !== userId){
+            socket.emit(eventName, data);
         }
-    }
+    });
 };
-
