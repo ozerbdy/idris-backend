@@ -7,6 +7,7 @@ const PackageRepository = require('../db/PackageRepository');
 const TransportationRepository = require('../db/TransportationRepository');
 const GoogleMapsClient = require('../helpers/googleMapsHelpers').client;
 const ResponseHelpers = require('../helpers/responseHelpers');
+const SocketIOManager = require('../socket/socketIOManager');
 const Constants = require('../constants/constants');
 
 module.exports.get = async (req, res) => {
@@ -33,6 +34,8 @@ module.exports.get = async (req, res) => {
 };
 
 module.exports.finish = async (req, res) => {
+
+    //TODO send package state updated socket event
     const user = res.locals.user;
     const userId = user._id;
     try{
@@ -79,6 +82,8 @@ module.exports.validateApply = function(req, res, next){
     next();
 };
 module.exports.apply = async (req, res) => {
+
+    //TODO send packet state update socket event
     const user = res.locals.user;
     const userId = user._id;
     const userCoordinates = req.body.coordinates;
@@ -134,11 +139,14 @@ module.exports.apply = async (req, res) => {
                 TransportationRepository.add(userId, packageTransportationObjects)
             ]);
 
-            return res.send({
+            res.send({
                 status: ResponseHelpers.getBasicResponseObject(Constants.SuccessInfo),
                 packages: packagesToCarry,
                 gatheringPoint: Constants.GATHERING_POINT_COORDINATES
             });
+
+            const updatedPackages = await PackageRepository.getByIds(packageObjectIds);
+            SocketIOManager.broadcastOnlineExceptUser(userId, Constants.SocketEvent.packageStateChanged, updatedPackages);
         }
         return ResponseHelpers.sendBasicResponse(res, Constants.ErrorInfo.Transportation.AlreadyExists);
     }catch(err){
