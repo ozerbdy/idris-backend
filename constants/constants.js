@@ -66,3 +66,7 @@ module.exports.GOOGLE_MAPS_STATUS = {
     ok: 'OK',
     noResult: 'ZERO_RESULTS'
 };
+
+module.exports.SocketEvent = {
+    packageStateChanged: 'packageStateChanged'
+};
