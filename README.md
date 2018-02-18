@@ -33,10 +33,10 @@ _Team Members:_
 - [Reusable]()
 - [Permission/Location]()
 - [NVActivityIndicatorView]()
-- [DeepDiff]()
 ##### *Utils*
 - [Marshal]()
 - [SwiftFormat/CLI]()
+- [DeepDiff]()
 ##### *Resources*
 - [R.swift]()
 - [UIFontComplete]()
