@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const TypeHelpers = require('../helpers/typeHelpers');
 const UserRepository = require('../db/UserRepository');
 
@@ -43,4 +44,14 @@ module.exports.emitEvent = function(eventName, data){
             socket.emit(eventName, data);
         }
     }
+};
+
+module.exports.broadcastOnlineExceptUser = function(userId ,eventName, data){
+    if(clients[userId]){
+        const socket = clients[userId];
+        if(socket){
+            socket.broadcast.emit(eventName, data);
+        }
+    }
+};
 };
