@@ -5,6 +5,7 @@ const Promise = require('bluebird');
 const TypeHelpers = require('../helpers/typeHelpers');
 const PackageRepository = require('../db/PackageRepository');
 const ResponseHelpers = require('../helpers/responseHelpers');
+const SocketIOManager = require('../socket/socketIOManager');
 const TransportationRepository = require('../db/TransportationRepository');
 const Constants = require('../constants/constants');
 
@@ -49,6 +50,8 @@ module.exports.pickUp = async (req, res) => {
                     PackageRepository.updateState(packageId, Constants.PackageState.beingCarried),
                     TransportationRepository.updatePackageStatuses(userId, packages)
                 ]);
+
+                SocketIOManager.broadcastOnlineExceptUser(Constants.SocketEvent.packageStateChanged, packageUpdateResult.value);
 
                 return res.send({
                     status: ResponseHelpers.getBasicResponseObject(Constants.SuccessInfo),
